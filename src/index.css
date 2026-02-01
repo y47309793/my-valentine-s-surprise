@@ -2,87 +2,95 @@
 @tailwind components;
 @tailwind utilities;
 
-/* Definition of the design system. All colors, gradients, fonts, etc should be defined here. 
-All colors MUST be HSL.
-*/
+@import url('https://fonts.googleapis.com/css2?family=Caveat:wght@400;500;600;700&family=Quicksand:wght@300;400;500;600;700&display=swap');
 
 @layer base {
   :root {
-    --background: 0 0% 100%;
-    --foreground: 222.2 84% 4.9%;
+    /* Romantic Valentine Color Palette */
+    --background: 350 100% 98%;
+    --foreground: 350 50% 20%;
 
-    --card: 0 0% 100%;
-    --card-foreground: 222.2 84% 4.9%;
+    --card: 350 100% 99%;
+    --card-foreground: 350 50% 15%;
 
-    --popover: 0 0% 100%;
-    --popover-foreground: 222.2 84% 4.9%;
+    --popover: 350 100% 99%;
+    --popover-foreground: 350 50% 15%;
 
-    --primary: 222.2 47.4% 11.2%;
-    --primary-foreground: 210 40% 98%;
+    /* Deep romantic rose */
+    --primary: 346 77% 50%;
+    --primary-foreground: 0 0% 100%;
 
-    --secondary: 210 40% 96.1%;
-    --secondary-foreground: 222.2 47.4% 11.2%;
+    /* Soft blush pink */
+    --secondary: 350 100% 95%;
+    --secondary-foreground: 346 77% 40%;
 
-    --muted: 210 40% 96.1%;
-    --muted-foreground: 215.4 16.3% 46.9%;
+    --muted: 350 30% 92%;
+    --muted-foreground: 350 20% 45%;
 
-    --accent: 210 40% 96.1%;
-    --accent-foreground: 222.2 47.4% 11.2%;
+    /* Warm peach accent */
+    --accent: 15 90% 85%;
+    --accent-foreground: 15 70% 30%;
 
     --destructive: 0 84.2% 60.2%;
     --destructive-foreground: 210 40% 98%;
 
-    --border: 214.3 31.8% 91.4%;
-    --input: 214.3 31.8% 91.4%;
-    --ring: 222.2 84% 4.9%;
+    --border: 350 50% 90%;
+    --input: 350 50% 90%;
+    --ring: 346 77% 50%;
 
-    --radius: 0.5rem;
+    --radius: 1rem;
+
+    /* Custom Valentine colors */
+    --rose-light: 350 100% 96%;
+    --rose-medium: 346 77% 65%;
+    --rose-dark: 346 77% 40%;
+    --coral: 15 90% 75%;
+    --peach: 25 100% 90%;
+    --cream: 40 60% 97%;
+    --love-red: 0 85% 55%;
+    --heart-pink: 330 85% 70%;
+
+    /* Gradients */
+    --gradient-romantic: linear-gradient(135deg, hsl(350 100% 96%) 0%, hsl(346 77% 90%) 50%, hsl(15 90% 92%) 100%);
+    --gradient-love: linear-gradient(135deg, hsl(346 77% 65%) 0%, hsl(0 85% 55%) 100%);
+    --gradient-blush: linear-gradient(180deg, hsl(350 100% 98%) 0%, hsl(350 100% 94%) 100%);
+    --gradient-sunset: linear-gradient(135deg, hsl(346 77% 70%) 0%, hsl(15 90% 75%) 50%, hsl(25 100% 85%) 100%);
+
+    /* Shadows */
+    --shadow-romantic: 0 10px 40px -10px hsl(346 77% 50% / 0.2);
+    --shadow-card: 0 4px 20px -4px hsl(346 77% 50% / 0.15);
+    --shadow-glow: 0 0 30px hsl(346 77% 60% / 0.3);
 
     --sidebar-background: 0 0% 98%;
-
     --sidebar-foreground: 240 5.3% 26.1%;
-
     --sidebar-primary: 240 5.9% 10%;
-
     --sidebar-primary-foreground: 0 0% 98%;
-
     --sidebar-accent: 240 4.8% 95.9%;
-
     --sidebar-accent-foreground: 240 5.9% 10%;
-
     --sidebar-border: 220 13% 91%;
-
     --sidebar-ring: 217.2 91.2% 59.8%;
   }
 
   .dark {
-    --background: 222.2 84% 4.9%;
-    --foreground: 210 40% 98%;
-
-    --card: 222.2 84% 4.9%;
-    --card-foreground: 210 40% 98%;
-
-    --popover: 222.2 84% 4.9%;
-    --popover-foreground: 210 40% 98%;
-
-    --primary: 210 40% 98%;
-    --primary-foreground: 222.2 47.4% 11.2%;
-
-    --secondary: 217.2 32.6% 17.5%;
-    --secondary-foreground: 210 40% 98%;
-
-    --muted: 217.2 32.6% 17.5%;
-    --muted-foreground: 215 20.2% 65.1%;
-
-    --accent: 217.2 32.6% 17.5%;
-    --accent-foreground: 210 40% 98%;
-
+    --background: 350 30% 8%;
+    --foreground: 350 30% 95%;
+    --card: 350 30% 10%;
+    --card-foreground: 350 30% 95%;
+    --popover: 350 30% 10%;
+    --popover-foreground: 350 30% 95%;
+    --primary: 346 77% 60%;
+    --primary-foreground: 0 0% 100%;
+    --secondary: 350 30% 15%;
+    --secondary-foreground: 346 77% 70%;
+    --muted: 350 20% 18%;
+    --muted-foreground: 350 20% 65%;
+    --accent: 15 70% 25%;
+    --accent-foreground: 15 90% 85%;
     --destructive: 0 62.8% 30.6%;
     --destructive-foreground: 210 40% 98%;
-
-    --border: 217.2 32.6% 17.5%;
-    --input: 217.2 32.6% 17.5%;
-    --ring: 212.7 26.8% 83.9%;
+    --border: 350 20% 20%;
+    --input: 350 20% 20%;
+    --ring: 346 77% 60%;
     --sidebar-background: 240 5.9% 10%;
     --sidebar-foreground: 240 4.8% 95.9%;
     --sidebar-primary: 224.3 76.3% 48%;
@@ -100,6 +108,224 @@ All colors MUST be HSL.
   }
 
   body {
-    @apply bg-background text-foreground;
+    @apply bg-background text-foreground font-quicksand;
+  }
+
+  html {
+    scroll-behavior: smooth;
+  }
+}
+
+@layer components {
+  .font-handwritten {
+    font-family: 'Caveat', cursive;
+  }
+
+  .font-quicksand {
+    font-family: 'Quicksand', sans-serif;
+  }
+
+  .gradient-romantic {
+    background: var(--gradient-romantic);
+  }
+
+  .gradient-love {
+    background: var(--gradient-love);
+  }
+
+  .gradient-blush {
+    background: var(--gradient-blush);
+  }
+
+  .gradient-sunset {
+    background: var(--gradient-sunset);
+  }
+
+  .shadow-romantic {
+    box-shadow: var(--shadow-romantic);
+  }
+
+  .shadow-card {
+    box-shadow: var(--shadow-card);
+  }
+
+  .shadow-glow {
+    box-shadow: var(--shadow-glow);
+  }
+
+  .text-gradient-love {
+    background: var(--gradient-love);
+    -webkit-background-clip: text;
+    -webkit-text-fill-color: transparent;
+    background-clip: text;
+  }
+
+  /* Valentine Button Styles */
+  .btn-valentine {
+    @apply px-8 py-4 rounded-full font-semibold text-lg transition-all duration-300 transform;
+    box-shadow: var(--shadow-card);
+  }
+
+  .btn-valentine:hover {
+    transform: translateY(-2px) scale(1.02);
+    box-shadow: var(--shadow-romantic);
+  }
+
+  .btn-valentine:active {
+    transform: translateY(0) scale(0.98);
+  }
+
+  .btn-yes {
+    @apply btn-valentine bg-primary text-primary-foreground;
+  }
+
+  .btn-yes:hover {
+    @apply shadow-glow;
+  }
+
+  .btn-no {
+    @apply btn-valentine bg-secondary text-secondary-foreground border-2 border-primary/20;
+  }
+
+  /* Card Styles */
+  .card-valentine {
+    @apply rounded-3xl p-6 bg-card shadow-card transition-all duration-300;
+  }
+
+  .card-valentine:hover {
+    @apply shadow-romantic;
+    transform: translateY(-4px);
+  }
+
+  /* Gift Card Styles */
+  .gift-card {
+    @apply card-valentine cursor-pointer overflow-hidden relative;
+    background: linear-gradient(135deg, hsl(var(--card)) 0%, hsl(var(--secondary)) 100%);
+  }
+
+  .gift-card::before {
+    content: '';
+    @apply absolute inset-0 opacity-0 transition-opacity duration-300;
+    background: var(--gradient-sunset);
+  }
+
+  .gift-card:hover::before {
+    @apply opacity-10;
+  }
+
+  /* Floating Hearts Animation */
+  @keyframes float-up {
+    0% {
+      transform: translateY(100vh) rotate(0deg);
+      opacity: 1;
+    }
+    100% {
+      transform: translateY(-100px) rotate(360deg);
+      opacity: 0;
+    }
+  }
+
+  @keyframes pulse-heart {
+    0%, 100% {
+      transform: scale(1);
+    }
+    50% {
+      transform: scale(1.1);
+    }
+  }
+
+  @keyframes wiggle {
+    0%, 100% {
+      transform: rotate(-3deg);
+    }
+    50% {
+      transform: rotate(3deg);
+    }
+  }
+
+  @keyframes bounce-soft {
+    0%, 100% {
+      transform: translateY(0);
+    }
+    50% {
+      transform: translateY(-10px);
+    }
+  }
+
+  @keyframes shimmer {
+    0% {
+      background-position: -200% center;
+    }
+    100% {
+      background-position: 200% center;
+    }
+  }
+
+  @keyframes typewriter {
+    from {
+      width: 0;
+    }
+    to {
+      width: 100%;
+    }
+  }
+
+  .animate-float-up {
+    animation: float-up 6s ease-in-out infinite;
+  }
+
+  .animate-pulse-heart {
+    animation: pulse-heart 1.5s ease-in-out infinite;
+  }
+
+  .animate-wiggle {
+    animation: wiggle 0.5s ease-in-out;
+  }
+
+  .animate-bounce-soft {
+    animation: bounce-soft 2s ease-in-out infinite;
+  }
+
+  .animate-shimmer {
+    background: linear-gradient(90deg, transparent, hsl(var(--primary) / 0.2), transparent);
+    background-size: 200% 100%;
+    animation: shimmer 2s infinite;
+  }
+
+  /* Love Letter Styles */
+  .love-letter {
+    @apply font-handwritten text-2xl md:text-3xl leading-relaxed;
+    color: hsl(var(--foreground));
+  }
+
+  .love-letter-paper {
+    background: linear-gradient(180deg, hsl(40 60% 97%) 0%, hsl(40 50% 95%) 100%);
+    background-image: repeating-linear-gradient(
+      transparent,
+      transparent 31px,
+      hsl(350 50% 85% / 0.3) 31px,
+      hsl(350 50% 85% / 0.3) 32px
+    );
+    @apply rounded-2xl p-8 md:p-12 shadow-romantic;
+  }
+
+  /* Photo Gallery Styles */
+  .photo-frame {
+    @apply rounded-2xl overflow-hidden shadow-card transition-all duration-500;
+  }
+
+  .photo-frame:hover {
+    @apply shadow-romantic;
+    transform: scale(1.05) rotate(2deg);
+  }
+
+  .photo-frame:nth-child(even):hover {
+    transform: scale(1.05) rotate(-2deg);
+  }
+}
+
+@layer utilities {
+  .text-balance {
+    text-wrap: balance;
   }
 }
