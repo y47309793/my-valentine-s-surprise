@@ -5,15 +5,15 @@ import { cva, type VariantProps } from "class-variance-authority";
 import { cn } from "@/lib/utils";
 
 const buttonVariants = cva(
-  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden transform hover:scale-105 hover:-translate-y-0.5 active:scale-100 active:translate-y-0",
+  "inline-flex items-center justify-center gap-2 whitespace-nowrap rounded-xl text-sm font-semibold ring-offset-background transition-all duration-300 ease-out focus-visible:outline-none focus-visible:ring-2 focus-visible:ring-ring focus-visible:ring-offset-2 disabled:pointer-events-none disabled:opacity-50 [&_svg]:pointer-events-none [&_svg]:size-4 [&_svg]:shrink-0 relative overflow-hidden transform hover:scale-105 hover:-translate-y-0.5 active:scale-100 active:translate-y-0 group",
   {
     variants: {
       variant: {
-        default: "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30",
-        destructive: "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/25 hover:shadow-xl hover:shadow-destructive/30",
-        outline: "border-2 border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground hover:border-accent",
-        secondary: "bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground shadow-md hover:shadow-lg",
-        ghost: "hover:bg-accent/80 hover:text-accent-foreground backdrop-blur-sm",
+        default: "bg-gradient-to-r from-primary to-primary/90 text-primary-foreground shadow-lg shadow-primary/25 hover:shadow-xl hover:shadow-primary/30 hover:shadow-2xl hover:shadow-primary/40",
+        destructive: "bg-gradient-to-r from-destructive to-destructive/90 text-destructive-foreground shadow-lg shadow-destructive/25 hover:shadow-xl hover:shadow-destructive/30 hover:shadow-2xl hover:shadow-destructive/40",
+        outline: "border-2 border-input bg-background/80 backdrop-blur-sm hover:bg-accent hover:text-accent-foreground hover:border-accent hover:shadow-lg hover:shadow-accent/20",
+        secondary: "bg-gradient-to-r from-secondary to-secondary/80 text-secondary-foreground shadow-md hover:shadow-lg hover:shadow-secondary/30",
+        ghost: "hover:bg-accent/80 hover:text-accent-foreground backdrop-blur-sm hover:shadow-md",
         link: "text-primary underline-offset-4 hover:underline",
       },
       size: {
@@ -37,9 +37,55 @@ export interface ButtonProps
 }
 
 const Button = React.forwardRef<HTMLButtonElement, ButtonProps>(
-  ({ className, variant, size, asChild = false, ...props }, ref) => {
+  ({ className, variant, size, asChild = false, onClick, ...props }, ref) => {
     const Comp = asChild ? Slot : "button";
-    return <Comp className={cn(buttonVariants({ variant, size, className }))} ref={ref} {...props} />;
+    const [ripples, setRipples] = React.useState<Array<{ x: number; y: number; id: number }>>([]);
+    const rippleIdRef = React.useRef(0);
+
+    const handleClick = (e: React.MouseEvent<HTMLButtonElement>) => {
+      if (!asChild) {
+        const button = e.currentTarget;
+        const rect = button.getBoundingClientRect();
+        const x = e.clientX - rect.left;
+        const y = e.clientY - rect.top;
+        const id = rippleIdRef.current++;
+
+        setRipples((prev) => [...prev, { x, y, id }]);
+
+        setTimeout(() => {
+          setRipples((prev) => prev.filter((ripple) => ripple.id !== id));
+        }, 600);
+      }
+
+      onClick?.(e);
+    };
+
+    return (
+      <Comp
+        className={cn(buttonVariants({ variant, size, className }))}
+        ref={ref}
+        onClick={handleClick}
+        {...props}
+      >
+        {!asChild && (
+          <>
+            {ripples.map((ripple) => (
+              <span
+                key={ripple.id}
+                className="absolute rounded-full bg-white/30 pointer-events-none animate-ripple"
+                style={{
+                  left: ripple.x,
+                  top: ripple.y,
+                  transform: "translate(-50%, -50%)",
+                }}
+              />
+            ))}
+            <span className="absolute inset-0 opacity-0 group-hover:opacity-100 transition-opacity duration-300 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full group-hover:animate-shimmer" />
+          </>
+        )}
+        {props.children}
+      </Comp>
+    );
   },
 );
 Button.displayName = "Button";

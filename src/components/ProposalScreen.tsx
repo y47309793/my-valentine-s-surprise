@@ -1,21 +1,21 @@
-import { useState, useRef, useEffect } from 'react';
+import { useState, useRef, useEffect, useMemo } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Heart, Sparkles, ArrowRight } from 'lucide-react';
 
 interface ProposalScreenProps {
   onYes: () => void;
+  onLoadingStart?: () => void;
 }
 
 // ============================================
-// CUSTOMIZABLE: Funny messages and GIF URLs
+// CUSTOMIZABLE: Elegant messages
 // ============================================
-const FUNNY_MESSAGES = [
-  "Will you be my Valentine? 💖",
-  "Are you sure sure? 🥺",
-  "That button seems dangerous… 😏",
-  "Let's try that again, my love 💕",
-  "Pretty please? With a cherry on top? 🍒",
-  "I'll take that as a YES 💖",
-];
+import { PROPOSAL_MESSAGES, PROPOSAL_EMOJI_URL } from '@/config/valentine';
+
+// ============================================
+// CUSTOMIZABLE: Elegant messages
+// ============================================
+const ELEGANT_MESSAGES = PROPOSAL_MESSAGES;
 
 // Replace these with your own GIF URLs
 const FUNNY_GIFS = [
@@ -26,200 +26,454 @@ const FUNNY_GIFS = [
   "https://media.giphy.com/media/v1.Y2lkPTc5MGI3NjExNjR0d2x1MnJnbHY4cmE3aGN0YnJraTRyYWJmaWhrejJpcWR0Y3VvOCZlcD12MV9pbnRlcm5hbF9naWZfYnlfaWQmY3Q9Zw/l0MYt5jPR6QX5pnqM/giphy.gif",
 ];
 
-const ProposalScreen = ({ onYes }: ProposalScreenProps) => {
+const ProposalScreen = ({ onYes, onLoadingStart }: ProposalScreenProps) => {
   const [noClickCount, setNoClickCount] = useState(0);
   const [noButtonStyle, setNoButtonStyle] = useState({});
   const [showAutoYes, setShowAutoYes] = useState(false);
   const containerRef = useRef<HTMLDivElement>(null);
 
-  const currentMessage = FUNNY_MESSAGES[Math.min(noClickCount, FUNNY_MESSAGES.length - 1)];
+  const currentMessage = ELEGANT_MESSAGES[Math.min(noClickCount, ELEGANT_MESSAGES.length - 1)];
   const currentGif = noClickCount > 0 ? FUNNY_GIFS[(noClickCount - 1) % FUNNY_GIFS.length] : null;
 
   useEffect(() => {
-    if (noClickCount >= 5) {
+    if (noClickCount >= 6) {
       setShowAutoYes(true);
-      setTimeout(() => {
-        onYes();
+      const timer = setTimeout(() => {
+        onLoadingStart?.();
+        // Add a small delay before calling onYes to show the loader
+        setTimeout(() => {
+          onYes();
+        }, 100);
       }, 2000);
+      return () => clearTimeout(timer);
     }
-  }, [noClickCount, onYes]);
+  }, [noClickCount, onYes, onLoadingStart]);
 
   const handleNoClick = () => {
     const newCount = noClickCount + 1;
     setNoClickCount(newCount);
 
-    // Different mischievous behaviors based on click count
+    // Custom path based on user's diagram
+    // Path: bottom-right -> top-right -> bottom-right (lower) -> bottom-left -> top-left
     if (newCount === 1) {
-      // Move away
+      // Move to bottom-right area
       setNoButtonStyle({
-        transform: 'translateX(100px)',
+        transform: 'translate(280px, 220px)',
       });
     } else if (newCount === 2) {
-      // Shrink
+      // Move to top-right area
       setNoButtonStyle({
-        transform: 'scale(0.7) translateY(-50px)',
+        transform: 'translate(280px, -180px)',
       });
     } else if (newCount === 3) {
-      // Move to opposite side
+      // Move to bottom-right (lower position)
       setNoButtonStyle({
-        transform: 'translateX(-150px) scale(0.5)',
+        transform: 'translate(280px, 280px)',
       });
     } else if (newCount === 4) {
-      // Almost invisible
+      // Move to bottom-left area
       setNoButtonStyle({
-        transform: 'translateX(80px) translateY(100px) scale(0.3)',
-        opacity: 0.5,
+        transform: 'translate(-280px, 280px)',
+      });
+    } else if (newCount === 5) {
+      // Move to top-left area (final position before auto-yes)
+      setNoButtonStyle({
+        transform: 'translate(-280px, -180px)',
+        opacity: 0.8,
       });
     }
   };
 
   const handleNoHover = () => {
-    if (noClickCount >= 2) {
-      // Random position jump on hover
-      const randomX = (Math.random() - 0.5) * 200;
-      const randomY = (Math.random() - 0.5) * 100;
-      setNoButtonStyle(prev => ({
-        ...prev,
-        transform: `translate(${randomX}px, ${randomY}px) scale(${0.8 - noClickCount * 0.1})`,
-      }));
-    }
+    // Disable random hover movement to keep the custom path intact
+    // User can enable this if they want the button to jump on hover
   };
 
+  // Memoize random values for background shapes
+  const backgroundShapes = useMemo(() => {
+    return [...Array(12)].map((_, i) => ({
+      id: `shape-${i}`,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      width: `${120 + Math.random() * 250}px`,
+      height: `${120 + Math.random() * 250}px`,
+      background: `radial-gradient(circle, 
+        rgba(251, 207, 232, ${0.15 + Math.random() * 0.1}) 0%, 
+        rgba(244, 114, 182, ${0.08 + Math.random() * 0.08}) 50%, 
+        transparent 100%)`,
+      x: (Math.random() - 0.5) * 150,
+      y: (Math.random() - 0.5) * 150,
+      duration: 12 + Math.random() * 8,
+      delay: i * 1.2,
+    }));
+  }, []);
+
+  // Memoize random values for floating icons
+  const floatingIcons = useMemo(() => {
+    return [...Array(12)].map((_, i) => ({
+      id: `icon-${i}`,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      color: `hsl(${340 + Math.random() * 20} ${60 + Math.random() * 20}% ${75 + Math.random() * 15}%)`,
+      size: 24 + Math.random() * 16,
+      duration: 8 + Math.random() * 4,
+      delay: i * 0.5,
+    }));
+  }, []);
+
+  // Memoize random values for sparkles
+  const sparkleEffects = useMemo(() => {
+    return [...Array(15)].map((_, i) => ({
+      id: `sparkle-${i}`,
+      left: `${Math.random() * 100}%`,
+      top: `${Math.random() * 100}%`,
+      size: 8 + Math.random() * 4,
+      duration: 3 + Math.random() * 2,
+      delay: Math.random() * 4,
+    }));
+  }, []);
+
   return (
-    <div 
+    <div
       ref={containerRef}
-      className="min-h-screen flex flex-col items-center justify-center px-4 py-8 gradient-romantic relative overflow-hidden"
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-8 relative overflow-hidden bg-pink-theme"
     >
-      {/* Background decorative hearts */}
-      <div className="absolute inset-0 overflow-hidden pointer-events-none">
-        {[...Array(6)].map((_, i) => (
+      {/* Enhanced geometric shapes with pink theme */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {backgroundShapes.map((shape) => (
           <motion.div
-            key={i}
-            className="absolute text-4xl md:text-6xl opacity-10"
+            key={shape.id}
+            className="absolute"
             style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
+              left: shape.left,
+              top: shape.top,
+              width: shape.width,
+              height: shape.height,
+              background: shape.background,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+              transform: 'translate3d(0,0,0)', // Force GPU acceleration
+              willChange: 'transform, opacity',
             }}
             animate={{
-              y: [0, -20, 0],
-              rotate: [0, 10, -10, 0],
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.4, 0.2],
+              x: [shape.x],
+              y: [shape.y],
             }}
             transition={{
-              duration: 4 + i,
+              duration: shape.duration,
               repeat: Infinity,
-              delay: i * 0.5,
+              delay: shape.delay,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
+
+      {/* Elegant floating icons */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {floatingIcons.map((icon) => (
+          <motion.div
+            key={icon.id}
+            className="absolute"
+            style={{
+              left: icon.left,
+              top: icon.top,
+              color: icon.color,
+              opacity: 0.08,
+              transform: 'translate3d(0,0,0)',
+            }}
+            animate={{
+              y: [0, -40, 0],
+              rotate: [0, 360],
+              scale: [1, 1.1, 1],
+            }}
+            transition={{
+              duration: icon.duration,
+              repeat: Infinity,
+              delay: icon.delay,
+              ease: 'easeInOut',
             }}
           >
-            💖
+            <Heart size={icon.size} strokeWidth={1.5} fill="currentColor" />
           </motion.div>
         ))}
       </div>
 
+      {/* Subtle sparkle effects */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none">
+        {sparkleEffects.map((sparkle) => (
+          <motion.div
+            key={sparkle.id}
+            className="absolute"
+            style={{
+              left: sparkle.left,
+              top: sparkle.top,
+            }}
+            animate={{
+              scale: [0, 1, 0],
+              opacity: [0, 0.6, 0],
+              rotate: [0, 180],
+            }}
+            transition={{
+              duration: sparkle.duration,
+              repeat: Infinity,
+              delay: sparkle.delay,
+              ease: 'easeInOut',
+            }}
+          >
+            <Sparkles size={sparkle.size} className="text-rose-300" strokeWidth={2} />
+          </motion.div>
+        ))}
+      </div>
+
+      {/* Glassmorphism card container */}
       <motion.div
-        className="text-center z-10 max-w-lg mx-auto"
+        className="text-center z-20 max-w-2xl mx-auto relative"
         initial={{ opacity: 0, y: 30 }}
         animate={{ opacity: 1, y: 0 }}
         transition={{ duration: 0.8 }}
       >
-        {/* Main Question */}
-        <motion.h1
-          key={currentMessage}
-          className="font-handwritten text-4xl md:text-6xl lg:text-7xl text-foreground mb-8 leading-tight"
-          initial={{ opacity: 0, scale: 0.9 }}
-          animate={{ opacity: 1, scale: 1 }}
-          transition={{ duration: 0.5 }}
+        {/* Elegant glass card */}
+        <motion.div
+          className="backdrop-blur-2xl bg-white/40 rounded-3xl p-10 md:p-16 border border-white/50 shadow-[0_8px_32px_0_rgba(0,0,0,0.08)] relative overflow-hidden"
+          initial={{ scale: 0.96, opacity: 0 }}
+          animate={{ scale: 1, opacity: 1 }}
+          transition={{ duration: 0.8, delay: 0.2, ease: [0.16, 1, 0.3, 1] }}
         >
-          {currentMessage}
-        </motion.h1>
-
-        {/* GIF Display */}
-        <AnimatePresence mode="wait">
-          {currentGif && (
-            <motion.div
-              key={currentGif}
-              className="mb-8 rounded-2xl overflow-hidden shadow-romantic mx-auto max-w-xs"
-              initial={{ opacity: 0, scale: 0.8, y: 20 }}
-              animate={{ opacity: 1, scale: 1, y: 0 }}
-              exit={{ opacity: 0, scale: 0.8, y: -20 }}
-              transition={{ duration: 0.4 }}
-            >
-              <img
-                src={currentGif}
-                alt="Cute reaction"
-                className="w-full h-auto"
-              />
-            </motion.div>
-          )}
-        </AnimatePresence>
-
-        {/* Buttons */}
-        {!showAutoYes ? (
-          <motion.div 
-            className="flex flex-col sm:flex-row gap-4 justify-center items-center relative min-h-[120px]"
-            layout
-          >
-            {/* Yes Button - Grows with each No click */}
-            <motion.button
-              onClick={onYes}
-              className="btn-yes"
-              whileHover={{ scale: 1.05 }}
-              whileTap={{ scale: 0.95 }}
-              animate={{
-                scale: 1 + noClickCount * 0.1,
-              }}
-              transition={{ type: 'spring', stiffness: 300 }}
-            >
-              <motion.span
-                className="inline-block mr-2"
-                animate={{ scale: [1, 1.2, 1] }}
-                transition={{ duration: 0.6, repeat: Infinity }}
-              >
-                💘
-              </motion.span>
-              Yes
-            </motion.button>
-
-            {/* No Button - Mischievous behavior */}
-            {noClickCount < 5 && (
-              <motion.button
-                onClick={handleNoClick}
-                onMouseEnter={handleNoHover}
-                className="btn-no"
-                style={noButtonStyle}
-                transition={{ type: 'spring', stiffness: 200, damping: 15 }}
-                whileTap={{ scale: 0.9 }}
-              >
-                <span className="mr-2">😒</span>
-                No
-              </motion.button>
-            )}
-          </motion.div>
-        ) : (
+          {/* Subtle animated border */}
           <motion.div
+            className="absolute inset-0 rounded-3xl pointer-events-none"
+            style={{
+              background: 'linear-gradient(135deg, rgba(236, 72, 153, 0.1), rgba(244, 114, 182, 0.05), rgba(236, 72, 153, 0.1))',
+              backgroundSize: '200% 200%',
+            }}
+            animate={{
+              backgroundPosition: ['0% 0%', '100% 100%'],
+            }}
+            transition={{
+              duration: 8,
+              repeat: Infinity,
+              ease: 'linear',
+            }}
+          />
+
+          {/* Main Question - Elegant typography */}
+          <motion.div
+            className="relative z-10 mb-12"
             initial={{ opacity: 0, y: 20 }}
             animate={{ opacity: 1, y: 0 }}
-            className="text-2xl font-handwritten text-primary"
+            transition={{ duration: 0.8, delay: 0.4 }}
           >
-            <motion.span
-              animate={{ scale: [1, 1.1, 1] }}
-              transition={{ duration: 0.5, repeat: Infinity }}
+            {/* Cute Bear Emoji GIF */}
+            <motion.div
+              className="flex justify-center mb-6"
+              initial={{ scale: 0 }}
+              animate={{ scale: 1 }}
+              transition={{ delay: 0.5, type: 'spring', stiffness: 200 }}
             >
-              ✨ Taking that as a YES! ✨
-            </motion.span>
+              <div className="h-40 overflow-hidden relative rounded-2xl w-48">
+                <img
+                  src={PROPOSAL_EMOJI_URL}
+                  alt="Cute Bear"
+                  className="w-full h-full object-cover object-top"
+                  style={{ transform: 'scale(1.1)' }} // Slight zoom to help with filling/cropping if needed
+                />
+              </div>
+            </motion.div>
+
+            <motion.h1
+              key={currentMessage}
+              className="font-handwritten text-5xl md:text-7xl lg:text-8xl leading-[1.1] mb-6"
+              style={{
+                color: '#7c2d12',
+                fontWeight: 600,
+                letterSpacing: '-0.02em',
+              }}
+              initial={{ opacity: 0, scale: 0.95 }}
+              animate={{ opacity: 1, scale: 1 }}
+              transition={{ duration: 0.5, type: 'spring', stiffness: 200 }}
+            >
+              {currentMessage}
+            </motion.h1>
+
+            {/* Elegant decorative line */}
+            <motion.div
+              className="h-px bg-gradient-to-r from-transparent via-rose-300 to-transparent mx-auto"
+              style={{ width: '120px' }}
+              initial={{ scaleX: 0 }}
+              animate={{ scaleX: 1 }}
+              transition={{ duration: 0.8, delay: 0.6 }}
+            />
           </motion.div>
-        )}
+
+          {/* Decorative icons */}
+          <div className="absolute top-6 left-6 opacity-30">
+            <motion.div
+              animate={{ rotate: [0, 360], scale: [1, 1.1, 1] }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear' }}
+            >
+              <Heart size={24} className="text-rose-400" fill="currentColor" />
+            </motion.div>
+          </div>
+          <div className="absolute top-6 right-6 opacity-30">
+            <motion.div
+              animate={{ rotate: [360, 0], scale: [1, 1.1, 1] }}
+              transition={{ duration: 20, repeat: Infinity, ease: 'linear', delay: 0.5 }}
+            >
+              <Heart size={24} className="text-rose-400" fill="currentColor" />
+            </motion.div>
+          </div>
+
+          {/* GIF Display with modern frame */}
+          <AnimatePresence mode="wait">
+            {currentGif && (
+              <motion.div
+                key={currentGif}
+                className="mb-8 rounded-3xl overflow-hidden mx-auto max-w-xs relative group"
+                initial={{ opacity: 0, scale: 0.8, y: 20, rotateY: -15 }}
+                animate={{ opacity: 1, scale: 1, y: 0, rotateY: 0 }}
+                exit={{ opacity: 0, scale: 0.8, y: -20, rotateY: 15 }}
+                transition={{ duration: 0.5, type: 'spring', stiffness: 200 }}
+                style={{
+                  boxShadow: '0 20px 60px -15px rgba(236, 72, 153, 0.4), 0 0 40px rgba(244, 114, 182, 0.2)',
+                }}
+              >
+                {/* Glow effect */}
+                <motion.div
+                  className="absolute -inset-1 bg-gradient-to-r from-pink-400 via-rose-400 to-red-400 rounded-3xl opacity-20 blur-xl group-hover:opacity-40 transition-opacity"
+                  animate={{
+                    opacity: [0.2, 0.4, 0.2],
+                  }}
+                  transition={{
+                    duration: 2,
+                    repeat: Infinity,
+                    ease: 'easeInOut',
+                  }}
+                />
+                <div className="relative rounded-3xl overflow-hidden bg-white/10 backdrop-blur-sm border border-white/20">
+                  <img
+                    src={currentGif}
+                    alt="Cute reaction"
+                    className="w-full h-auto relative z-10"
+                  />
+                </div>
+              </motion.div>
+            )}
+          </AnimatePresence>
+
+          {/* Buttons with modern design */}
+          {!showAutoYes ? (
+            <motion.div
+              className="flex flex-col sm:flex-row gap-6 justify-center items-center relative min-h-[140px]"
+              layout
+            >
+              {/* Yes Button - Elegant and sophisticated */}
+              <motion.button
+                onClick={onYes}
+                className="relative overflow-hidden group px-12 py-5 rounded-full font-semibold text-lg text-white flex items-center gap-3"
+                style={{
+                  background: `linear-gradient(135deg, 
+                    hsl(${346 + noClickCount * 2} 77% ${50 + noClickCount * 2}%) 0%, 
+                    hsl(${0 + noClickCount * 2} 85% ${55 + noClickCount * 2}%) 100%)`,
+                  boxShadow: `0 4px 20px -4px hsl(346 77% 50% / 0.4), 
+                    0 0 0 1px rgba(255,255,255,0.1) inset`,
+                }}
+                whileHover={{
+                  scale: 1.05 + noClickCount * 0.03,
+                  boxShadow: "0 8px 30px -8px hsl(346 77% 50% / 0.6), 0 0 0 1px rgba(255,255,255,0.2) inset",
+                  y: -2
+                }}
+                whileTap={{ scale: 0.98 + noClickCount * 0.03 }}
+                animate={{
+                  scale: 1 + noClickCount * 0.08,
+                }}
+                transition={{ type: 'spring', stiffness: 300, damping: 25 }}
+              >
+                <motion.span
+                  className="absolute inset-0 bg-gradient-to-r from-transparent via-white/20 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"
+                />
+                <Heart
+                  size={20}
+                  className="relative z-10"
+                  fill="currentColor"
+                  strokeWidth={2.5}
+                />
+                <span className="relative z-10 tracking-wide">Yes</span>
+              </motion.button>
+
+              {/* No Button - Elegant glassmorphism */}
+              {noClickCount < 6 && (
+                <motion.button
+                  onClick={handleNoClick}
+                  onMouseEnter={handleNoHover}
+                  className="relative overflow-hidden group px-12 py-5 rounded-full font-semibold text-lg backdrop-blur-xl bg-white/50 border border-white/60 text-gray-700 flex items-center gap-3"
+                  style={{
+                    ...noButtonStyle,
+                    boxShadow: '0 4px 20px -4px rgba(0,0,0,0.1), 0 0 0 1px rgba(0,0,0,0.05) inset',
+                  }}
+                  transition={{ type: 'spring', stiffness: 200, damping: 20 }}
+                  whileHover={{
+                    scale: 1.04,
+                    boxShadow: "0 6px 25px -6px rgba(0,0,0,0.15), 0 0 0 1px rgba(0,0,0,0.08) inset",
+                    borderColor: 'rgba(0,0,0,0.1)',
+                    backgroundColor: 'rgba(255,255,255,0.6)',
+                  }}
+                  whileTap={{ scale: 0.97 }}
+                >
+                  <motion.span
+                    className="absolute inset-0 bg-gradient-to-r from-transparent via-white/40 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-500"
+                  />
+                  <ArrowRight
+                    size={18}
+                    className="relative z-10 rotate-180"
+                    strokeWidth={2.5}
+                  />
+                  <span className="relative z-10 tracking-wide">No</span>
+                </motion.button>
+              )}
+            </motion.div>
+          ) : (
+            <motion.div
+              initial={{ opacity: 0, y: 20, scale: 0.95 }}
+              animate={{ opacity: 1, y: 0, scale: 1 }}
+              className="text-2xl md:text-3xl font-handwritten relative z-10 text-rose-600 flex items-center gap-3 justify-center"
+            >
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity }}
+              >
+                <Heart size={28} className="text-rose-500" fill="currentColor" />
+              </motion.div>
+              <span className="font-semibold">Taking that as a yes</span>
+              <motion.div
+                animate={{ scale: [1, 1.1, 1] }}
+                transition={{ duration: 1.5, repeat: Infinity, delay: 0.3 }}
+              >
+                <Heart size={28} className="text-rose-500" fill="currentColor" />
+              </motion.div>
+            </motion.div>
+          )}
+        </motion.div>
       </motion.div>
 
-      {/* Decorative bottom hearts */}
+      {/* Elegant bottom decoration */}
       <motion.div
-        className="absolute bottom-8 left-1/2 -translate-x-1/2 text-6xl opacity-20"
-        animate={{ y: [0, -10, 0] }}
-        transition={{ duration: 2, repeat: Infinity }}
+        className="absolute bottom-12 left-1/2 -translate-x-1/2 relative z-0 flex items-center gap-2"
+        animate={{
+          y: [0, -8, 0],
+          opacity: [0.2, 0.3, 0.2],
+        }}
+        transition={{ duration: 4, repeat: Infinity, ease: 'easeInOut' }}
       >
-        💕
+        <Heart size={32} className="text-rose-200" fill="currentColor" strokeWidth={1} />
+        <div className="h-px w-16 bg-gradient-to-r from-transparent via-rose-300 to-transparent" />
+        <Heart size={32} className="text-rose-200" fill="currentColor" strokeWidth={1} />
       </motion.div>
     </div>
   );
 };
 
 export default ProposalScreen;
+

@@ -1,5 +1,6 @@
 import { useState, useEffect } from 'react';
 import { motion, AnimatePresence } from 'framer-motion';
+import { Mail, Heart, Camera, PenTool } from 'lucide-react';
 
 interface LoveLetterProps {
   onComplete: () => void;
@@ -8,27 +9,12 @@ interface LoveLetterProps {
 // ============================================
 // CUSTOMIZABLE: Your love letter text
 // ============================================
-const LOVE_LETTER_LINES = [
-  "My Dearest Love,",
-  "",
-  "From the moment I met you,",
-  "I knew my life would never be the same.",
-  "",
-  "Every day with you feels like a gift,",
-  "wrapped in laughter, warmth, and endless love.",
-  "",
-  "You make the ordinary extraordinary,",
-  "and turn simple moments into treasured memories.",
-  "",
-  "Thank you for being my best friend,",
-  "my confidant, my partner in everything.",
-  "",
-  "I fall more in love with you each day,",
-  "and I can't wait for all our tomorrows.",
-  "",
-  "Forever & Always,",
-  "Your Valentine 💕",
-];
+import { LOVE_LETTER_LINES } from '@/config/valentine';
+
+// ============================================
+// CUSTOMIZABLE: Your love letter text
+// ============================================
+// Uses lines from config
 
 const LoveLetter = ({ onComplete }: LoveLetterProps) => {
   const [visibleLines, setVisibleLines] = useState(0);
@@ -46,15 +32,48 @@ const LoveLetter = ({ onComplete }: LoveLetterProps) => {
   }, [visibleLines]);
 
   return (
-    <div className="min-h-screen flex flex-col items-center justify-center px-4 py-12 gradient-romantic">
+    <div
+      className="min-h-screen flex flex-col items-center justify-center px-4 py-12 relative overflow-hidden bg-pink-theme"
+    >
+      {/* Enhanced background shapes */}
+      <div className="absolute inset-0 overflow-hidden pointer-events-none z-0">
+        {[...Array(7)].map((_, i) => (
+          <motion.div
+            key={`shape-${i}`}
+            className="absolute"
+            style={{
+              left: `${Math.random() * 100}%`,
+              top: `${Math.random() * 100}%`,
+              width: `${120 + Math.random() * 250}px`,
+              height: `${120 + Math.random() * 250}px`,
+              background: `radial-gradient(circle, 
+                rgba(251, 207, 232, ${0.15 + Math.random() * 0.1}) 0%, 
+                rgba(244, 114, 182, ${0.08 + Math.random() * 0.08}) 50%, 
+                transparent 100%)`,
+              borderRadius: '50%',
+              filter: 'blur(50px)',
+            }}
+            animate={{
+              scale: [1, 1.3, 1],
+              opacity: [0.2, 0.4, 0.2],
+            }}
+            transition={{
+              duration: 12 + Math.random() * 8,
+              repeat: Infinity,
+              delay: i * 1.3,
+              ease: 'easeInOut',
+            }}
+          />
+        ))}
+      </div>
       {/* Decorative seal */}
       <motion.div
-        className="absolute top-8 right-8 text-5xl"
+        className="absolute top-8 right-8 z-20"
         initial={{ rotate: -20, scale: 0 }}
         animate={{ rotate: 0, scale: 1 }}
         transition={{ delay: 0.5, type: 'spring' }}
       >
-        💌
+        <Mail size={40} className="text-rose-400" strokeWidth={1.5} />
       </motion.div>
 
       {/* Letter container */}
@@ -73,11 +92,10 @@ const LoveLetter = ({ onComplete }: LoveLetterProps) => {
             <AnimatePresence key={index}>
               {index < visibleLines && (
                 <motion.p
-                  className={`love-letter ${line === "" ? "h-6" : ""} ${
-                    index === 0 || index === LOVE_LETTER_LINES.length - 2 
-                      ? "font-bold" 
+                  className={`love-letter ${line === "" ? "h-6" : ""} ${index === 0 || index === LOVE_LETTER_LINES.length - 2
+                      ? "font-bold"
                       : ""
-                  }`}
+                    }`}
                   initial={{ opacity: 0, x: -20 }}
                   animate={{ opacity: 1, x: 0 }}
                   transition={{ duration: 0.5 }}
@@ -89,20 +107,20 @@ const LoveLetter = ({ onComplete }: LoveLetterProps) => {
           ))}
         </div>
 
-        {/* Decorative corner hearts */}
+        {/* Decorative corner icons */}
         <motion.div
-          className="absolute -top-4 -left-4 text-3xl"
+          className="absolute -top-4 -left-4"
           animate={{ rotate: [0, 10, -10, 0] }}
           transition={{ duration: 3, repeat: Infinity }}
         >
-          💕
+          <Heart size={24} className="text-rose-300" fill="currentColor" strokeWidth={1.5} />
         </motion.div>
         <motion.div
-          className="absolute -bottom-4 -right-4 text-3xl"
+          className="absolute -bottom-4 -right-4"
           animate={{ rotate: [0, -10, 10, 0] }}
           transition={{ duration: 3, repeat: Infinity, delay: 1.5 }}
         >
-          💕
+          <Heart size={24} className="text-rose-300" fill="currentColor" strokeWidth={1.5} />
         </motion.div>
       </motion.div>
 
@@ -111,15 +129,22 @@ const LoveLetter = ({ onComplete }: LoveLetterProps) => {
         {isComplete && (
           <motion.button
             onClick={onComplete}
-            className="btn-valentine bg-primary text-primary-foreground mt-8"
+            className="btn-valentine bg-primary text-primary-foreground mt-8 relative overflow-hidden group"
             initial={{ opacity: 0, y: 30 }}
             animate={{ opacity: 1, y: 0 }}
             transition={{ delay: 0.3 }}
-            whileHover={{ scale: 1.05 }}
+            whileHover={{
+              scale: 1.08,
+              boxShadow: '0 0 40px hsl(346 77% 60% / 0.5), 0 20px 60px -15px hsl(346 77% 50% / 0.4)',
+              y: -3
+            }}
             whileTap={{ scale: 0.95 }}
           >
-            <span className="mr-2">📸</span>
-            One Last Gift
+            <motion.span
+              className="absolute inset-0 bg-gradient-to-r from-transparent via-white/30 to-transparent -translate-x-full group-hover:translate-x-full transition-transform duration-700"
+            />
+            <span className="relative z-10 tracking-wide">One Last Gift</span>
+            <Camera size={18} className="relative z-10 ml-2" strokeWidth={2.5} />
           </motion.button>
         )}
       </AnimatePresence>
@@ -127,12 +152,12 @@ const LoveLetter = ({ onComplete }: LoveLetterProps) => {
       {/* Reading indicator */}
       {!isComplete && (
         <motion.div
-          className="mt-8 flex items-center gap-2 text-muted-foreground"
+          className="mt-8 flex items-center gap-2 text-muted-foreground relative z-20"
           animate={{ opacity: [0.5, 1, 0.5] }}
           transition={{ duration: 1.5, repeat: Infinity }}
         >
-          <span className="text-xl">✍️</span>
-          <span className="font-handwritten text-lg">Reading...</span>
+          <PenTool size={18} strokeWidth={2} />
+          <span className="font-quicksand text-base">Reading...</span>
         </motion.div>
       )}
     </div>
